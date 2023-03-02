@@ -60,48 +60,32 @@ namespace Polygones
             while(true)
             {
                 //Хотя бы одна точка находится внутри видимой области
-                if ((code1 | code2) == 0) { return true; }
+                if (code1  == 0 || code2 == 0) { return true; }
                 //Обе точки находятся с одной стороны видимой области
                 if ((code1 & code2) > 0) { return false; }
 
                 //Определяем точку пересечения
-                var code_out = code1 != 0 ? code1 : code2;
-                var x = 0.0;
-                var y = 0.0;
-                if ((code_out & top) != 0)
+                if ((code1 & top) != 0)
                 {
-                    x = x1 + (x2 - x1) * (maxY - y1) / (y2 - y1);
-                    y = maxY;
+                    x1 = x1 + (x2 - x1) * (maxY - y1) / (y2 - y1);
+                    y1 = maxY;
                 }
-                else if ((code_out & bottom) != 0)
+                else if ((code1 & bottom) != 0)
                 {
-                    x = x1 + (x2 - x1) * (minY - y1) / (y2 - y1);
-                    y = minY;
+                    x1 = x1 + (x2 - x1) * (minY - y1) / (y2 - y1);
+                    y1 = minY;
                 }
-                else if ((code_out & right) != 0)
+                else if ((code1 & right) != 0)
                 {
-                    y = y1 + (y2 - y1) * (maxX - x1) / (x2 - x1);
-                    x = maxX;
+                    y1 = y1 + (y2 - y1) * (maxX - x1) / (x2 - x1);
+                    x1 = maxX;
                 }
-                else if ((code_out & left) != 0)
+                else if ((code1 & left) != 0)
                 {
-                    y = y1 + (y2 - y1) * (minX - x1) / (x2 - x1);
-                    x = minX;
+                    y1 = y1 + (y2 - y1) * (minX - x1) / (x2 - x1);
+                    x1 = minX;
                 }
-
-                //Перемещаем один из концов отрезка в точку пересечения
-                if (code_out == code1)
-                {
-                    x1 = x;
-                    y1 = y;
-                    code1 = GetCode(x1, y1);
-                }
-                else
-                {
-                    x2 = x;
-                    y2 = y;
-                    code2 = GetCode(x2, y2);
-                }
+                code1 = GetCode(x1, y1);
             }
         }
 

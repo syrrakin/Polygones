@@ -13,12 +13,14 @@ namespace Polygones
             var rigthBottomCorner = new Point(100, 0);
             var polygones = new List<Polygone>();  
             //Заполняем полигонами со случайными координатами и количеством сторон
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 10; i++)
             {
                 polygones.Add(CreateRandomPolygone(100, 4));
             }
             Console.WriteLine($"Левый верхний угол: {leftTopCorner}");
             Console.WriteLine($"Правый нижний угол: {rigthBottomCorner}");
+            Console.WriteLine($"Все полигоны:");
+            polygones.ForEach(p => Console.WriteLine(p));
             Console.WriteLine("Видимые полигоны:");
             var solver = new Solver(leftTopCorner.X, rigthBottomCorner.Y, rigthBottomCorner.Y, leftTopCorner.Y);            
             solver.FindVisiblePolygones(polygones).ForEach(p => Console.WriteLine(p));
