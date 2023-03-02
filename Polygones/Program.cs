@@ -9,8 +9,8 @@ namespace Polygones
         static void Main()
         {
             //Видимая область
-            var leftTopCorner = new Point(0, 100);
-            var rigthBottomCorner = new Point(100, 0);
+            var leftTopCorner = new Point(-50, 50);
+            var rigthBottomCorner = new Point(50, -50);
             var polygones = new List<Polygone>();  
             //Заполняем полигонами со случайными координатами и количеством сторон
             for (int i = 1; i <= 10; i++)
