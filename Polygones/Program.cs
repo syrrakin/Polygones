@@ -22,7 +22,7 @@ namespace Polygones
             Console.WriteLine($"Все полигоны:");
             polygones.ForEach(p => Console.WriteLine(p));
             Console.WriteLine("Видимые полигоны:");
-            var solver = new Solver(leftTopCorner.X, rigthBottomCorner.Y, rigthBottomCorner.Y, leftTopCorner.Y);            
+            var solver = new Solver(leftTopCorner.X, rigthBottomCorner.Y, rigthBottomCorner.X, leftTopCorner.Y);            
             solver.FindVisiblePolygones(polygones).ForEach(p => Console.WriteLine(p));
             Console.WriteLine("Нажмите Enter для завершения");
             Console.ReadLine();
