@@ -1,46 +1,60 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Polygones
 {
-    class Program
+    internal class Program
     {
-        static void Main()
+        private static void Main()
         {
+            var stopwatch = Stopwatch.StartNew();
             //Видимая область
-            var leftTopCorner = new Point(-50, 50);
-            var rigthBottomCorner = new Point(50, -50);
-            var polygones = new List<Polygone>();  
-            //Заполняем полигонами со случайными координатами и количеством сторон
-            for (int i = 1; i <= 10; i++)
-            {
-                polygones.Add(CreateRandomPolygone(100, 4));
-            }
-            Console.WriteLine($"Левый верхний угол: {leftTopCorner}");
-            Console.WriteLine($"Правый нижний угол: {rigthBottomCorner}");
-            Console.WriteLine($"Все полигоны:");
-            polygones.ForEach(p => Console.WriteLine(p));
-            Console.WriteLine("Видимые полигоны:");
-            var solver = new Solver(leftTopCorner.X, rigthBottomCorner.Y, rigthBottomCorner.X, leftTopCorner.Y);            
-            solver.FindVisiblePolygones(polygones).ForEach(p => Console.WriteLine(p));
+            var leftTopCorner = new Point(-50.0, 50.0);
+            var rigthBottomCorner = new Point(50.0, -50.0);            
+            Console.WriteLine($"{stopwatch.Elapsed} Видимая область: {leftTopCorner} {rigthBottomCorner}");
+            //Генерируем случайные полигоны
+            var polygoneCount = 10000000;
+            var coordinateFactor = 1000;
+            var maxPointsCount = 4;            
+            Console.WriteLine($"{stopwatch.Elapsed} Рабочая область: [{-coordinateFactor};{-coordinateFactor}] [{coordinateFactor};{coordinateFactor}]");
+            var polygones = CreateRandomPolygones(polygoneCount, coordinateFactor, maxPointsCount);            
+            Console.WriteLine($"{stopwatch.Elapsed} Сгенерировано полигонов: {polygoneCount}");
+            var solver = new Solver(leftTopCorner.X, rigthBottomCorner.Y, rigthBottomCorner.X, leftTopCorner.Y);
+            var visiblePolygones = solver.FindVisiblePolygones(polygones);
+            Console.WriteLine($"{stopwatch.Elapsed} Видимых полигонов: {visiblePolygones.Count()}");
             Console.WriteLine("Нажмите Enter для завершения");
             Console.ReadLine();
         }
 
-        static Polygone CreateRandomPolygone(int coordinateFactor, int maxSides)
+        private static IEnumerable<Polygone> CreateRandomPolygones(int polygoneCount, int coordinateFactor, int maxPointsCount)
         {
-            var rand = new Random();
-            int GetRandomCoordinate() => rand.Next(-coordinateFactor, coordinateFactor);
-            var result = new Polygone();
-            var sides = maxSides <= 2 ? 2 : rand.Next(2, maxSides + 1);
-            for (int i = 1; i <= sides; i++)
-            {
-                result.Points.Add(new Point(GetRandomCoordinate(), GetRandomCoordinate()));
-            }
-            return result;
+            var bag = new ConcurrentBag<Polygone>();
+            int seed = Environment.TickCount;
+            var threadRandom = new ThreadLocal<Random>(() => new Random(Interlocked.Increment(ref seed)));
+            Parallel.For(0, polygoneCount, i => {
+                bag.Add(CreateRandomPolygone(coordinateFactor, maxPointsCount, threadRandom.Value));
+            });
+            return bag;
         }
 
-        
+        private static Polygone CreateRandomPolygone(int coordinateFactor, int maxPointsCount, Random random)
+        {
+            var pointsCount = maxPointsCount <= 2 ? 2 : random.Next(2, maxPointsCount + 1);
+            var polygone = new Polygone();
+            for (int i = 0; i < pointsCount; i++)
+            {
+                polygone.Points.Add(new Point(GetRandomCoordinate(coordinateFactor, random), GetRandomCoordinate(coordinateFactor, random)));
+            }            
+            return polygone;
+        }
+
+        private static int GetRandomCoordinate(int coordinateFactor, Random random) => random.Next(-coordinateFactor, coordinateFactor);
+
     }
 }

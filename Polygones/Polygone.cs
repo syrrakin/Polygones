@@ -7,12 +7,8 @@ namespace Polygones
 {
     internal class Polygone
     {
-        public List<Point> Points { get; }
+        public List<Point> Points { get; } = new List<Point>();
 
-        public Polygone(params Point[] points)
-        {
-            Points = new List<Point>(points);
-        }
         public override string ToString()
         {
             return string.Join(" ", Points.Select(p => p.ToString()));
